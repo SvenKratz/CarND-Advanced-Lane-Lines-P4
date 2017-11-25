@@ -43,7 +43,7 @@ I start by preparing "object points", which will be the (x, y, z) coordinates of
 
 I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image using the `cv2.undistort()` function and obtained this result:
 
-![Camera Calibration](writeup_images/cam_calib.png)
+![Camera Calibration](./output_images/cam_calib.png)
 
 (Left: original, Right: calibrated image)
 
@@ -54,7 +54,7 @@ The section "Static/Development Processing Pipeline Script" in the iPython noteb
 #### 1. Provide an example of a distortion-corrected image.
 
 To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
-![Distortion Correction](writeup_images/distortion_correction.png)
+![Distortion Correction](./output_images/distortion_correction.png)
 
 (Left: original, Right: corrected image)
 
@@ -98,7 +98,7 @@ combined = combine_binary_or(gradient_magn, gradient_dir)
 
 The furthest image to the right example of the resultant binary image at this point in the pipeline:
 
-![Thresholding](writeup_images/thresholding.png)
+![Thresholding](./output_images/thresholding.png)
 
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
@@ -112,12 +112,12 @@ dst_points = np.float32([[184, 720], [184, 0], [1214, 0], [1214,720]])
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image:
 
-![Perspective Transform Verification](writeup_images/perspective_trans.png)
+![Perspective Transform Verification](output_images/perspective_trans.png)
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
 Inspired by slide 34 of the Lane Finding Project page, I used a sliding window search algorithm to find lane lines. The cell with the title "Sliding Window Search Algorithm" contains the code for this. After finding the pixels of the left / right lane line, I used a 2nd order polynomial fit to derive parameters for the curving of the lane line. The code for polynomial fitting is contained in the cell with the title "Polynomial Fitting and Visualization". The following image shows a result of this code:
-![Sliding Window Search Results](writeup_images/sliding_window.png)
+![Sliding Window Search Results](output_images/sliding_window.png)
 
 (Left: found pixels and windows. Right: pixels selected by the windows belonging to left and right lane lines.)
 
@@ -141,7 +141,7 @@ The function basically uses the established parameters of the polynomial and app
 
 This is implemented in lines (214--230) of the cell with the title "Static/Development Processing Pipeline Script"
 
-![Output of Static Pipeline](writeup_images/static_output.png)
+![Output of Static Pipeline](output_images/static_output.png)
 
 ---
 
@@ -152,7 +152,6 @@ This is implemented in lines (214--230) of the cell with the title "Static/Devel
 Here's a [link to my video result on project_video.mp4](./lanefinding_output.mp4)
 
 ---
-
 ### Discussion
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
