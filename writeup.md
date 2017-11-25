@@ -68,7 +68,7 @@ First, I convert the input image into HLS color space. I use the S channel as ma
 
 ```Python
 # S seems like a good choice, so select this image for further processing
-    St = color_threshold(S, (120, 255))
+St = color_threshold(S, (120, 255))
 
 # H seems good to detect shadowy areas, which mess up lane finding
 # idea: use thresholded H to mask shadowy areas from S
