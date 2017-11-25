@@ -66,7 +66,7 @@ I used a combination of color and gradient thresholds to generate a binary image
 
 First, I convert the input image into HLS color space. I use the S channel as main source for lane lines, as they seem to be more prominent in this channel. However, I noticed that shadowy areas on the road can cause unwanted artifacts. I noticed that these shadows do show up prominently on in the H channel. Therefor I use the H channel to mask the shadows from the thresholded S channel using simple algebra as follows (lines 60--66 in the previously mentioned notebook cell):
 
-```
+```Python
 # S seems like a good choice, so select this image for further processing
     St = color_threshold(S, (120, 255))
 
@@ -80,7 +80,7 @@ St = St * (1 - Ht)
 
 After the thresholding step I use a binary or combination of gradient magnitude and gradient direction to filter out most of the image parts that are not the lane lines. The binary or function is implemented as follows:
 
-```
+```Python
 def combine_binary_or(img_a, img_b):
     # combine (OR) two binary images and output results
     binary_output_combined = np.zeros_like(img_a)
@@ -90,7 +90,7 @@ def combine_binary_or(img_a, img_b):
 
 The final thresholded and combined binary image  is generated as follows (lines 80--82 ):
 
-```
+```Python
 gradient_magn = mag_threshold(St, sobel_kernel= 7, thresh=(180, 255))
 gradient_dir = dir_threshold(St, sobel_kernel = 7, thresh=(0.6, 1.4))
 combined = combine_binary_or(gradient_magn, gradient_dir)
