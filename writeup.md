@@ -106,8 +106,8 @@ The furthest image to the right example of the resultant binary image at this po
 The code for my perspective transform is in lines 109--127 of the cell. I chose the hardcode the source and destination points in the following manner:
 
 ```python
-src_points = vertices = np.array([[(184,imshape[0]),(555, 465), (760, 465), (1214,imshape[0])]], dtype=np.int32)
-dst_points = np.float32([[184, 720], [184, 0], [1214, 0], [1214,720]])
+src_points = np.array([[(184,imshape[0]),(590, 445), (710, 445), (1150,imshape[0])]], dtype=np.float32)
+dst_points = np.float32([[184, 720], [250, 200], [1050, 200], [910,720]])
 ```
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image:
@@ -127,7 +127,7 @@ The curvature calculation is contained in the previously mentioned cell in the f
 
 ```Python
 # Define conversions in x and y from pixels space to meters
-ym_per_pix = 30/720 # meters per pixel in y dimension
+ym_per_pix = 65/720 # meters per pixel in y dimension
 xm_per_pix = 3.7/700 # meters per pixel in x dimension
 
 p_fit_y_cr = np.polyfit(y*ym_per_pix, x*xm_per_pix, 2)
