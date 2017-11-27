@@ -64,7 +64,7 @@ I used a combination of color and gradient thresholds to generate a binary image
 
 ##### Color Thresholding using HLS
 
-First, I convert the input image into HLS color space. I use the S channel as main source for lane lines, as they seem to be more prominent in this channel. However, I noticed that shadowy areas on the road can cause unwanted artifacts. I noticed that these shadows do show up prominently on in the H channel. Therefor I use the H channel to mask the shadows from the thresholded S channel using simple algebra as follows (lines 60--66 in the previously mentioned notebook cell):
+First, I convert the input image into HLS color space, and separate out RGB channels. I use the S channel as main source for lane lines, as they seem to be more prominent in this channel. I also use a relatively strictly thresholded version of the R channel to get any lane pixels that might have been missed by R. I also noticed that shadowy areas on the road can cause unwanted artifacts. I noticed that these shadows do show up prominently on in the H channel. Therefor I use the H channel to mask the shadows from the thresholded S channel using simple algebra as follows (lines 60--66 in the previously mentioned notebook cell):
 
 ```Python
 # S seems like a good choice, so select this image for further processing
@@ -75,6 +75,8 @@ St = color_threshold(S, (120, 255))
 Ht = color_threshold(H, (0, 30))
 St = St * (1 - Ht)
 ```
+
+
 
 ##### Application of Gradients to Highlight Lane Lines
 
@@ -88,12 +90,14 @@ def combine_binary_or(img_a, img_b):
     return binary_output_combined
 ```
 
-The final thresholded and combined binary image  is generated as follows (lines 80--82 ):
+The final binary image is an or combination of Sobel(H), Gradient_Dir(H) and Gradient_Dir(R):
+ (lines 60--119 ):
 
 ```Python
 gradient_magn = mag_threshold(St, sobel_kernel= 7, thresh=(180, 255))
 gradient_dir = dir_threshold(St, sobel_kernel = 7, thresh=(0.6, 1.4))
-combined = combine_binary_or(gradient_magn, gradient_dir)
+R_gradient_dir = dir_threshold(Rt, sobel_kernel = 7, thresh=(0.7, 1.3))
+combined = combine_binary_or(sobel_abs, combine_binary_or(gradient_dir, R_gradient_dir))
 ```
 
 The furthest image to the right example of the resultant binary image at this point in the pipeline:
@@ -103,11 +107,11 @@ The furthest image to the right example of the resultant binary image at this po
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform is in lines 109--127 of the cell. I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform is in lines 157--165 of the cell. I chose the hardcode the source and destination points in the following manner:
 
 ```python
 src_points = np.array([[(184,imshape[0]),(590, 445), (710, 445), (1150,imshape[0])]], dtype=np.float32)
-dst_points = np.float32([[184, 720], [250, 200], [1050, 200], [910,720]])
+dst_points = np.float32([[184, 720], [250, 0], [1050, 0], [910,720]])
 ```
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image:
@@ -116,7 +120,7 @@ I verified that my perspective transform was working as expected by drawing the 
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-Inspired by slide 34 of the Lane Finding Project page, I used a sliding window search algorithm to find lane lines. The cell with the title "Sliding Window Search Algorithm" contains the code for this. After finding the pixels of the left / right lane line, I used a 2nd order polynomial fit to derive parameters for the curving of the lane line. The code for polynomial fitting is contained in the cell with the title "Polynomial Fitting and Visualization". The following image shows a result of this code:
+Inspired by slide 34 of the Lane Finding Project page, I used a sliding window search algorithm to find lane lines. The cell with the title "Sliding Window Search Algorithm" contains the code for this. After finding the pixels of the left / right lane line, I used a 2nd order polynomial fit to derive parameters for the curving of the lane line. I reduced the window search size to 75 to avoid fitting non-lane pixels, and modified the code to continue on vertically, if no pixels have been found. The code for polynomial fitting is contained in the cell with the title "Polynomial Fitting and Visualization". The following image shows a result of this code:
 ![Sliding Window Search Results](output_images/sliding_window.png)
 
 (Left: found pixels and windows. Right: pixels selected by the windows belonging to left and right lane lines.)
@@ -128,7 +132,7 @@ The curvature calculation is contained in the previously mentioned cell in the f
 ```Python
 # Define conversions in x and y from pixels space to meters
 ym_per_pix = 65/720 # meters per pixel in y dimension
-xm_per_pix = 3.7/700 # meters per pixel in x dimension
+xm_per_pix = 3.7/750 # meters per pixel in x dimension
 
 p_fit_y_cr = np.polyfit(y*ym_per_pix, x*xm_per_pix, 2)
 curve_rad = ((1 + (2*p_fit_y_cr[0]*y_eval*ym_per_pix + p_fit_y_cr[1])**2)**1.5) / np.absolute(2*p_fit_y_cr[0])
